@@ -1,6 +1,6 @@
 name: Build InfraSnow Downloader
 
-on: 
+on:
   push:
     tags:
       - 'v*'
@@ -23,7 +23,8 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install pyinstaller "pyserial==3.5"
+          pip install -r requirements.txt
+          pip install pyinstaller
 
       - name: Build executable with PyInstaller
         run: |
@@ -40,11 +41,16 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/download-artifact@v4
-      - name: Upload Release Asset
+      - name: Retrieve Assets
+        uses: actions/download-artifact@v4
+        with:
+          path: ${{ github.workspace }}/artifacts
+      - name: List Assets
+        run: ls -lah ${{ github.workspace }}/artifacts
+      - name: Add Assets to Release
         uses: softprops/action-gh-release@v2
         with:
-          files: /home/runner/work/infrasnow-download/infrasnow-download/infrasnow_downloader*/*
+          files: ${{ github.workspace }}/artifacts/infrasnow_downloader*
           fail_on_unmatched_files: true
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
