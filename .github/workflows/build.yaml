@@ -41,11 +41,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v4
-        with:
-          path: dist
       - name: Upload Release Asset
         uses: softprops/action-gh-release@v2
         with:
-          files: dist/infrasnow_downloader* 
+          files: /home/runner/work/infrasnow-download/infrasnow-download/dist/infrasnow_downloader*
+          fail_on_unmatched_files: true
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
