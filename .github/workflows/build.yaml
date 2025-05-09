@@ -27,15 +27,13 @@ jobs:
           pip install pyinstaller
 
       - name: Build executable with PyInstaller
-        run: |
-          pyinstaller --console --onefile --icon assets/infrasnow.ico infrasnow_downloader.py
+        run: pyinstaller --console --onefile --icon assets/infrasnow.ico infrasnow_downloader.py
 
       - name: Archive Executable
         uses: actions/upload-artifact@v4
         with:
           name: infrasnow_downloader-${{ matrix.os }}
-          path: |
-            dist/infrasnow_downloader*
+          path: dist/infrasnow_downloader*
 
   release:
     needs: build
@@ -46,11 +44,17 @@ jobs:
         with:
           path: ${{ github.workspace }}/artifacts
       - name: List Assets
-        run: ls -lah ${{ github.workspace }}/artifacts
-      - name: Add Assets to Release
+        run: ls -lah ${{ github.workspace }}/artifacts/*
+      - name: Compress Assets
+        run: |
+          zip -j ${{ github.workspace }}/artifacts/infrasnow_downloader-windows-latest.zip ${{ github.workspace }}/artifacts/infrasnow_downloader-windows-latest/infrasnow_downloader.exe
+          tar czf ${{ github.workspace }}/artifacts/infrasnow_downloader-ubuntu-latest.tar.gz ${{ github.workspace }}/artifacts/infrasnow_downloader-ubuntu-latest/infrasnow_downloader
+          tar czf ${{ github.workspace }}/artifacts/infrasnow_downloader-macos-14.tar.gz ${{ github.workspace }}/artifacts/infrasnow_downloader-macos-14/infrasnow_downloader
+          tar czf ${{ github.workspace }}/artifacts/infrasnow_downloader-macos-15.tar.gz ${{ github.workspace }}/artifacts/infrasnow_downloader-macos-15/infrasnow_downloader
+      - name: Add Compressed Assets to Release
         uses: softprops/action-gh-release@v2
         with:
-          files: ${{ github.workspace }}/artifacts/infrasnow_downloader*
+          files: ${{ github.workspace }}/artifacts/infrasnow_downloader*.*
           fail_on_unmatched_files: true
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
