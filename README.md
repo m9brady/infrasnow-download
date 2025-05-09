@@ -13,7 +13,7 @@ Download the prebuilt executable for your platform from the [Releases page](http
 
 ### Environment Creation
 
-Create a new Python3 venv or mamba environment (mamba seems to work better) and add packages from [`requirements.txt`]('./requirements.txt'). If you also want to build executables you need to install `pyinstaller`. 
+Create a new Python3 venv or mamba environment (mamba seems to work better) and add packages from `requirements.txt`. If you also want to build executables you need to install `pyinstaller`. 
 
 Once `pyserial` is installed, you can choose to run `infrasnow_downloader.py` manually or proceed to build an executable.
 
