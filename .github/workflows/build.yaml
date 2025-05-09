@@ -48,9 +48,12 @@ jobs:
       - name: Compress Assets
         run: |
           zip -j ${{ github.workspace }}/artifacts/infrasnow_downloader-windows-latest.zip ${{ github.workspace }}/artifacts/infrasnow_downloader-windows-latest/infrasnow_downloader.exe
-          tar czf ${{ github.workspace }}/artifacts/infrasnow_downloader-ubuntu-latest.tar.gz ${{ github.workspace }}/artifacts/infrasnow_downloader-ubuntu-latest/infrasnow_downloader
-          tar czf ${{ github.workspace }}/artifacts/infrasnow_downloader-macos-14.tar.gz ${{ github.workspace }}/artifacts/infrasnow_downloader-macos-14/infrasnow_downloader
-          tar czf ${{ github.workspace }}/artifacts/infrasnow_downloader-macos-15.tar.gz ${{ github.workspace }}/artifacts/infrasnow_downloader-macos-15/infrasnow_downloader
+          cd ${{ github.workspace }}/artifacts/infrasnow_downloader-ubuntu-latest
+          tar czf ${{ github.workspace }}/artifacts/infrasnow_downloader-ubuntu-latest.tar.gz infrasnow_downloader
+          cd ${{ github.workspace }}/artifacts/infrasnow_downloader-macos-14
+          tar czf ${{ github.workspace }}/artifacts/infrasnow_downloader-macos-14.tar.gz infrasnow_downloader
+          cd ${{ github.workspace }}/artifacts/infrasnow_downloader-macos-15
+          tar czf ${{ github.workspace }}/artifacts/infrasnow_downloader-macos-15.tar.gz infrasnow_downloader
       - name: Add Compressed Assets to Release
         uses: softprops/action-gh-release@v2
         with:
