@@ -44,15 +44,15 @@ def detect_port():
                 ports, start=1
             ):
                 print(f"#{idx}  |  {device_port}: {device_desc!r} ({device_hwid})")
-                try:
-                    user_input = input("Select the device number from the list above: ")
-                    choice = int(user_input)
-                    port, desc, _ = ports[choice - 1]
-                    port_found = True
-                except ValueError:
-                    print(f"Invalid choice: {user_input!r} (must be numeric)")
-                except IndexError:
-                    print(f"Invalid choice: device #{choice} does not exist in listing")
+            try:
+                user_input = input("Select the device number from the list above: ")
+                choice = int(user_input)
+                port, desc, _ = ports[choice - 1]
+                port_found = True
+            except ValueError:
+                print(f"Invalid choice: {user_input!r} (must be numeric)")
+            except IndexError:
+                print(f"Invalid choice: device #{choice} does not exist in listing")
         if port_found:
             break
         # Even less-ideal case, no active comm ports detected. May indicate a problem with the host hardware
