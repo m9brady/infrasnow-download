@@ -5,12 +5,18 @@ from time import sleep
 import serial
 from serial.tools.list_ports import comports
 
-MAX_ATTEMPTS = 10  # tries
+MAX_ATTEMPTS = 10  # times program scans for devices before aborting
 SLEEP_DURATION = 5  # seconds
 
 
 def detect_port():
-    # will appear when the device is turned on and TX to USB is active
+    """
+    Identifies the USB-connected infrasnow datalogger by scanning the host computer's serial ports
+
+    Scenario A: only 1 USB comm port in-use, user is prompted to confirm it's the logger
+    Scenario B: multiple devices detected, user is prompted to choose which device is the logger
+    Scenario C: no devices detected (can happen if TX to USB is not active on the logger), program sleeps
+    """
     port_found = False
     attempts = 0
     while not port_found:
@@ -38,19 +44,22 @@ def detect_port():
                 ports, start=1
             ):
                 print(f"#{idx}  |  {device_port}: {device_desc!r} ({device_hwid})")
-            try:
-                choice = int(input("Select the device number to monitor: "))
-                port, desc, _ = ports[choice - 1]
-                port_found = True
-            except ValueError:
-                print("Invalid choice")
+                try:
+                    user_input = input("Select the device number from the list above: ")
+                    choice = int(user_input)
+                    port, desc, _ = ports[choice - 1]
+                    port_found = True
+                except ValueError:
+                    print(f"Invalid choice: {user_input!r} (must be numeric)")
+                except IndexError:
+                    print(f"Invalid choice: device #{choice} does not exist in listing")
         if port_found:
             break
         # Even less-ideal case, no active comm ports detected. May indicate a problem with the host hardware
-        print(f"No ports detected. Sleeping for {SLEEP_DURATION} seconds")
+        print(f"No ports detected. Sleeping for {SLEEP_DURATION} seconds [attempt {attempts+1} of {MAX_ATTEMPTS}]")
         attempts += 1
         if attempts == MAX_ATTEMPTS:
-            print(f"Maximum attempts ({MAX_ATTEMPTS}) reached. Aborting...")
+            print(f"Maximum attempts [{MAX_ATTEMPTS}] reached. Aborting...")
             sleep(SLEEP_DURATION)
             exit()
         sleep(SLEEP_DURATION)
