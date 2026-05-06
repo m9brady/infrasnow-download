@@ -33,7 +33,7 @@ def detect_port():
                     f"Detected device connected on COM port: {port}: {desc!r} ({hwid})"
                 )
                 choice = input(
-                    "Does the displayed device appear to be the SLF InfraSnow device? y/N"
+                    "Does the displayed device appear to be the SLF InfraSnow device? [y/N]: "
                 )
                 if choice.upper() in ["Y", "YES"]:
                     port_found = True
@@ -69,6 +69,9 @@ def detect_port():
 if __name__ == "__main__":
     # first, detect COM port to monitor
     port, desc = detect_port()
+    # initialize read buffer
+    buffer = b''
+    data_attempts = 0
     # establish connection to device
     try:
         with serial.Serial(
@@ -80,17 +83,22 @@ if __name__ == "__main__":
             timeout=0,
         ) as connection:
             print(f"Connection established with {port} device {desc!r}")
-            buffer = connection.read_all()
-            data_attempts = 1
-            while len(buffer) == 0:
-                print(f"No data stream detected. Sleeping for {SLEEP_DURATION} seconds")
-                sleep(SLEEP_DURATION)
-                buffer = connection.read_all()
+            while connection.in_waiting == 0:
                 data_attempts += 1
                 if data_attempts == MAX_ATTEMPTS:
                     print(f"Maximum attempts ({MAX_ATTEMPTS}) reached. Aborting...")
                     sleep(SLEEP_DURATION)
                     exit(1)
+                print(f"No data stream detected. Sleeping for {SLEEP_DURATION} seconds")
+                sleep(SLEEP_DURATION)
+            while connection.in_waiting:
+                chunk = connection.read(connection.in_waiting)
+                if chunk:
+                    buffer += chunk
+                # avoid race condition where not all data is read properly
+                # usually only happens when >120 measurements stored in
+                # logger memory
+                sleep(1)
     except serial.SerialException as e:
         print(f"Serial connection failed: {e}")
         exit(1)
