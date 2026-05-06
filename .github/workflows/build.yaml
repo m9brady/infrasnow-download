@@ -60,4 +60,4 @@ jobs:
           files: ${{ github.workspace }}/artifacts/infrasnow_downloader*.*
           fail_on_unmatched_files: true
         env:
-          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+          token: ${{ secrets.RELEASE_TOKEN }}
